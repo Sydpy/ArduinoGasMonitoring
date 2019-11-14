@@ -3,22 +3,28 @@
 #include "lora.h"
 #include "gas.h"
 
-SoftwareSerial loraSerial(10, 11); // RX, TX
+#define LORA_TX   10
+#define LORA_RX   11
+#define LORA_RST  12
+
+
+SoftwareSerial loraSerial(LORA_TX, LORA_RX);
 rn2xx3 lora(loraSerial);
 
 void setup()
 {
-  Serial.begin(57600); //serial port to computer
-  loraSerial.begin(9600); //serial port to radio
+  Serial.begin(57600);
+  loraSerial.begin(9600);
+
   Serial.println("Startup");
-  
-  lora_init(&lora, &loraSerial, 12);
+
+  lora_init(&lora, &loraSerial, LORA_RST);
   lora.tx("Starting gas sensor");
 }
-// the loop routine runs over and over again forever:
+
 void loop()
 {
     Serial.println("TXing");
-    lora.tx("!"); //one byte, blocking function
+    lora.tx("!");
     delay(200);
 }
