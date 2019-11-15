@@ -6,7 +6,7 @@
 
 #define CALIBRATION_MILLIS 900000
 
-float gas_calibration_value = 3.0;
+float gas_calibration_value = 3.14;
 
 float gas_calibration(int analogPin) {
 
@@ -45,7 +45,7 @@ float gas_calibration(int analogPin) {
   return gas_calibration_value;
 }
 
-float gas_measurement(int pin, int* CH4, int* CO, int* LPG, int* AIR) {
+float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
 
   float sensor_volt;
   float RS_gas;
@@ -62,5 +62,20 @@ float gas_measurement(int pin, int* CH4, int* CO, int* LPG, int* AIR) {
   *CO = (int) exp(double(-1.984 * log(double(ratio / 25.982))));
   *LPG = (int) exp(double(-2.087 * log(double(ratio / 27.633))));
 
+  Serial.print("Resistance ratio: ");
+  Serial.println(ratio);
+  
+  Serial.print("CH4: ");
+  Serial.print(*CH4);
+  Serial.println(" ppm");
+
+  Serial.print("CO : ");
+  Serial.print(*CO);
+  Serial.println(" ppm");
+  
+  Serial.print("LPG: ");
+  Serial.print(*LPG);
+  Serial.println(" ppm");
+  
   return ratio;
 }

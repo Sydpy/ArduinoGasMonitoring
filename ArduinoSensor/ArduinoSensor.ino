@@ -3,7 +3,7 @@
 #include "lora.h"
 #include "gas.h"
 
-#define DO_GAS_CALIBRATION
+//#define DO_GAS_CALIBRATION
 #define USE_OTAA
 
 #define LORA_TX   10
@@ -38,19 +38,18 @@ void setup()
 void loop()
 {
   int CH4, CO, LPG, AIR;
-  float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG, &AIR);
+  float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG);
 
+  String to_send = "";
+  to_send += String(gas_ratio);
+  to_send += ";";
+  to_send += String(CH4);
+  to_send += ";";
+  to_send += String(CO);
+  to_send += ";";
+  to_send += String(LPG);
 
-  Serial.print(CH4);
-  Serial.println(" ppm");
-  Serial.print(CO );
-  Serial.println(" ppm");
-  Serial.print(LPG );
-  Serial.println(" ppm");
+  lora.tx(to_send);
 
-  Serial.print("TXing : ");
-  Serial.println(gas_ratio);
-  lora.tx(String(gas_ratio));
-
-  delay(6000);
+  delay(1000);
 }
