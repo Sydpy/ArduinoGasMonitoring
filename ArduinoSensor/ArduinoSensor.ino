@@ -26,9 +26,13 @@ void setup()
   gas_calibration(GAS_PIN);
 #endif
 
-  lora_init(&lora, &lora_serial, LORA_RST);
-  lora.tx("Starting gas sensor");
+#ifdef USE_OTAA
+  lora_init_OTAA(&lora, &lora_serial, LORA_RST);
+#else
+  lora_init_ABP(&lora, &lora_serial, LORA_RST);
+#endif
 
+  lora.tx("Starting gas sensor");
 }
 
 void loop()
@@ -36,7 +40,7 @@ void loop()
   int CH4, CO, LPG, AIR;
   float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG, &AIR);
 
-  
+
   Serial.print(CH4);
   Serial.println(" ppm");
   Serial.print(CO );
