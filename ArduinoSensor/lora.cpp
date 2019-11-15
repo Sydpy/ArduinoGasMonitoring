@@ -33,7 +33,7 @@ void lora_init(rn2xx3* lora, SoftwareSerial* loraSerial, int rstPin) {
 
   //configure your keys and join the network
   Serial.println("Trying to join TTN");
-  bool join_result = lora->initOTAA(OTAA_APP_EUI, OTAA_APP_KEY);
+  bool   join_result = lora->initABP(devAddr, appSKey, nwkSKey);
 
   while(!join_result)
   {

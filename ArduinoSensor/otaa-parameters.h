@@ -1,7 +1,9 @@
 #ifndef __OTAA_PARAMS_H__
 #define __OTAA_PARAMS_H__
 
-#define OTAA_APP_EUI "CHANGEME"
-#define OTAA_APP_KEY "CHANGEME"
+
+#define devAddr  "26011E15"
+#define nwkSKey  "113D79833EFD64D78CE7C5A3C72C1E63"
+#define appSKey  "F134DC909C5F3EBA6B39E4DAD8264A1A"
 
 #endif
