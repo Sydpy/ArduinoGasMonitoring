@@ -4,42 +4,48 @@
 #include "gas.h"
 
 #define DO_GAS_CALIBRATION
-
 #define USE_OTAA
 
 #define LORA_TX   10
 #define LORA_RX   11
 #define LORA_RST  12
 
-#define GAS_PIN  A0
+#define GAS_PIN   A0
 
-
-
-SoftwareSerial loraSerial(LORA_TX, LORA_RX);
-rn2xx3 lora(loraSerial);
-float gasCalibr = 3.7;
+SoftwareSerial lora_serial(LORA_TX, LORA_RX);
+rn2xx3 lora(lora_serial);
 
 void setup()
 {
   Serial.begin(57600);
-  loraSerial.begin(9600);
+  lora_serial.begin(9600);
 
   Serial.println("Startup");
 
-  #ifdef DO_GAS_CALIBRATION
-    gasCalibr = gas_calibration(GAS_PIN);
-  #endif
+#ifdef DO_GAS_CALIBRATION
+  gas_calibration(GAS_PIN);
+#endif
 
-  Serial.print("Gas calibration value : ");
-  Serial.println(gasCalibr);
-
-  lora_init(&lora, &loraSerial, LORA_RST);
+  lora_init(&lora, &lora_serial, LORA_RST);
   lora.tx("Starting gas sensor");
+
 }
 
 void loop()
 {
-    Serial.println("TXing");
-    lora.tx("!");
-    delay(200);
+  int CH4, CO, LPG, AIR;
+  float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG, &AIR);
+
+  Serial.print("TXing : ");
+  Serial.println(gas_ratio);
+  Serial.print(CH4);
+  Serial.println(" ppm");
+  Serial.print(CO );
+  Serial.println(" ppm");
+  Serial.print(LPG );
+  Serial.println(" ppm");
+
+  lora.tx(String(gas_ratio));
+
+  delay(200);
 }
