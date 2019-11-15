@@ -36,8 +36,7 @@ void loop()
   int CH4, CO, LPG, AIR;
   float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG, &AIR);
 
-  Serial.print("TXing : ");
-  Serial.println(gas_ratio);
+  
   Serial.print(CH4);
   Serial.println(" ppm");
   Serial.print(CO );
@@ -45,7 +44,9 @@ void loop()
   Serial.print(LPG );
   Serial.println(" ppm");
 
+  Serial.print("TXing : ");
+  Serial.println(gas_ratio);
   lora.tx(String(gas_ratio));
 
-  delay(200);
+  delay(6000);
 }

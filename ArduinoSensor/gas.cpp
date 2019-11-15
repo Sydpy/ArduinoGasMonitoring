@@ -4,7 +4,7 @@
 #include <SoftwareSerial.h>
 #include <math.h>
 
-#define CALIBRATION_MILLIS 60000
+#define CALIBRATION_MILLIS 900000
 
 float gas_calibration_value = 3.0;
 
