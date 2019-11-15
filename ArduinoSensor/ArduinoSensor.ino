@@ -6,6 +6,8 @@
 //#define DO_GAS_CALIBRATION
 #define USE_OTAA
 
+#define RATIO_LIMIT 1.5
+
 #define LORA_TX   10
 #define LORA_RX   11
 #define LORA_RST  12
@@ -40,16 +42,21 @@ void loop()
   int CH4, CO, LPG, AIR;
   float gas_ratio = gas_measurement(GAS_PIN, &CH4, &CO, &LPG);
 
-  String to_send = "";
-  to_send += String(gas_ratio);
-  to_send += ";";
-  to_send += String(CH4);
-  to_send += ";";
-  to_send += String(CO);
-  to_send += ";";
-  to_send += String(LPG);
+  if (gas_ratio < RATIO_LIMIT) {
+    String to_send = "";
+    to_send += String(gas_ratio);
+    to_send += ";";
+    to_send += String(CH4);
+    to_send += ";";
+    to_send += String(CO);
+    to_send += ";";
+    to_send += String(LPG);
 
-  lora.tx(to_send);
+    Serial.print("TXing : ");
+    Serial.println(to_send);
+
+    lora.tx(to_send);
+  }
 
   delay(1000);
 }
