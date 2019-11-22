@@ -1,48 +1,32 @@
 #include "gas.h"
+#include "gas-parameters.h"
+
 #include <Arduino.h>
 #include <rn2xx3.h>
 #include <SoftwareSerial.h>
 #include <math.h>
 
-#define CALIBRATION_MILLIS 900000
+void gas_calibration(int analogPin) {
 
-float gas_calibration_value = 3.14;
+  float sensor_volt, sensor_res;
+  float sensor_value = 0;
 
-float gas_calibration(int analogPin) {
-
-  Serial.print("Gas sensor calibration, please wait ");
-  Serial.print(CALIBRATION_MILLIS / 1000);
-  Serial.print("s ... ");
-
-  unsigned long time_start = millis();
-
-  float sensor_volt;
-  float RS_air; //  Get the value of RS via in a clear air
-  float sensorValue;
-
-  while ((millis() - time_start) < CALIBRATION_MILLIS) {
-
-    sensorValue = 0;
-
-    /*--- Get a average data by testing 100 times ---*/
-    for (int x = 0 ; x < 100 ; x++)
-    {
-      sensorValue = sensorValue + analogRead(A0);
-    }
-    sensorValue = sensorValue / 100.0;
-
-    sensor_volt = sensorValue / 1024 * 5.0;
-    RS_air = (5.0 - sensor_volt) / sensor_volt; // omit *RL
-    gas_calibration_value = RS_air / 9.9; // The ratio of RS/R0 is 9.9 in LPG gas from Graph (Found using WebPlotDigitizer)
-
-    delay(1000);
+  /*--- Get a average data by testing 100 times ---*/
+  for (int x = 0 ; x < 100 ; x++)
+  {
+    sensor_value += analogRead(A0);
   }
+  sensor_value = sensor_value / 100.0;
 
-  Serial.println("Done");
-  Serial.print("Calibration value : ");
-  Serial.println(gas_calibration_value);
+  sensor_volt = sensor_value / 1024 * 5.0;
+  sensor_res = (5 - sensor_volt) / sensor_volt;
 
-  return gas_calibration_value;
+  Serial.print("Vs : ");
+  Serial.print(sensor_volt);
+  Serial.println(" V");
+  Serial.print("Rs : ");
+  Serial.print(sensor_res);
+  Serial.println(" ohms");
 }
 
 float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
@@ -53,10 +37,10 @@ float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
 
   pinMode(pin, INPUT);
   int sensorValue = analogRead(pin);
-  
+
   sensor_volt = ((float)sensorValue / 1024) * 5.0;
   RS_gas = (5.0 - sensor_volt) / sensor_volt;
-  ratio = RS_gas / gas_calibration_value;
+  ratio = RS_gas / GAS_SENSOR_R0;
 
   *CH4 = (int) exp(double(-2.985 * log(double(ratio / 15.374))));
   *CO = (int) exp(double(-1.984 * log(double(ratio / 25.982))));
@@ -64,7 +48,7 @@ float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
 
   Serial.print("Resistance ratio: ");
   Serial.println(ratio);
-  
+
   Serial.print("CH4: ");
   Serial.print(*CH4);
   Serial.println(" ppm");
@@ -72,10 +56,16 @@ float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
   Serial.print("CO : ");
   Serial.print(*CO);
   Serial.println(" ppm");
-  
+
   Serial.print("LPG: ");
   Serial.print(*LPG);
   Serial.println(" ppm");
-  
+
   return ratio;
+}
+
+void gas_setup_interrupt(int pwm_pin, int interrupt_pin, void (*subroutine)(void) ) {
+  pinMode(pwm_pin, OUTPUT);
+  analogWrite(pwm_pin, 255.0 * (float) GAS_SENSOR_V_THRESHOLD / 5.);
+  attachInterrupt(digitalPinToInterrupt(interrupt_pin), subroutine, RISING);
 }

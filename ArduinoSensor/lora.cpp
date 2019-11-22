@@ -24,7 +24,7 @@ void lora_init(rn2xx3* lora, SoftwareSerial* lora_serial, int rst_pin) {
     hweui = lora->hweui();
   }
 
-  Serial.println("RN2xx3 firmware version:");
+  Serial.print("RN2xx3 firmware version: ");
   Serial.println(lora->sysver());
 }
 
@@ -38,7 +38,7 @@ void lora_init_ABP(rn2xx3* lora, SoftwareSerial* lora_serial, int rst_pin) {
   
   //configure your keys and join the network
   Serial.println("Trying to join TTN");
-  bool join_result = lora->initABP(ABP_DEV_ADDR, ABP_NWK_SKEY, ABP_APP_SKEY);
+  bool join_result = lora->initABP(ABP_DEV_ADDR, ABP_APP_SKEY, ABP_NWK_SKEY);
   
   while(!join_result)
   {
