@@ -46,21 +46,6 @@ float gas_measurement(int pin, int* CH4, int* CO, int* LPG) {
   *CO = (int) exp(double(-1.984 * log(double(ratio / 25.982))));
   *LPG = (int) exp(double(-2.087 * log(double(ratio / 27.633))));
 
-  Serial.print("Resistance ratio: ");
-  Serial.println(ratio);
-
-  Serial.print("CH4: ");
-  Serial.print(*CH4);
-  Serial.println(" ppm");
-
-  Serial.print("CO : ");
-  Serial.print(*CO);
-  Serial.println(" ppm");
-
-  Serial.print("LPG: ");
-  Serial.print(*LPG);
-  Serial.println(" ppm");
-
   return ratio;
 }
 
